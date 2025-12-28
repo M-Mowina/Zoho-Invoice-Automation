@@ -6,6 +6,8 @@
 - **Purpose:** : Notify customers when an invoice is confirmed using an n8n workflow.
 - **Trigger:** : The workflow is triggered by a `zoho books webhook` that sends invoice data.
 
+- **Zoho Books side automation:** : The Zoho Books automation (see `images/Screenshot (686).png`) invokes this n8n workflow via the configured webhook. That Zoho automation is also responsible for sending email notifications to the customer and the branch manager (so the n8n workflow focuses on respond.io messaging and branch routing).
+
 **Flow Summary**
 - **Webhook:** : Receives invoice confirmation data payload from Zoho Books.
 - **Branch Mapping:** : Maps the invoice to one of nine corresponding branch managers for routing.
@@ -34,6 +36,7 @@
 **Files**
 - **Workflow Export:** See `Zoho Invoice Automation.json` in this repository for the workflow JSON export.
 - **Workflow Diagram:** `images/image.png` — visual overview of the node layout and data flow.
+- **Zoho Books Automation Screenshot:** `images/Screenshot (686).png` — shows the automation configuration on the Zoho Books side that triggers the webhook and handles email delivery to customer and branch manager.
 
 **Next Steps / Improvements**
 - Add logging or persistent audit entries for each invoice notification.
