@@ -7,7 +7,7 @@
 - **Trigger:** : The workflow is triggered by a `zoho books webhook` that sends invoice data.
 
 - **Zoho Books side automation:** : The Zoho Books automation (see `images/Screenshot (686).png`) invokes this n8n workflow via the configured webhook. That Zoho automation is also responsible for sending email notifications to the customer and the branch manager (so the n8n workflow focuses on respond.io messaging and branch routing).
-
+![Zoho Books Workflow Diagram](images/Screenshot (686).png)
 **Flow Summary**
 - **Webhook:** : Receives invoice confirmation data payload from Zoho Books.
 - **Branch Mapping:** : Maps the invoice to one of nine corresponding branch managers for routing.
