@@ -1,0 +1,466 @@
+{
+  "name": "Zoho Invoice Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "47b87a13-90ba-4fa0-8ea8-025938905a16",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1104,
+        -384
+      ],
+      "id": "dd1e89f7-1f2f-4124-bac6-4840772b72ef",
+      "name": "Webhook",
+      "webhookId": "47b87a13-90ba-4fa0-8ea8-025938905a16"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "branch Number",
+              "value": "={{\n  {\n    \"Head Office\": \"971526699343\",\n    \"shamkha\": \"971509184611\",\n    \"shahama\": \"971503309173\",\n    \"sarouj\": \"971503305374\",\n    \"Mushref\": \"971503308418\",\n    \"shakhbout\": \"971503308421\",\n    \"Towaya\": \"971503308395\",\n    \"Khorfakkan\": \"971503292581\",\n    \"MBZ\": \"971503321251\"\n  }[\n    $json.body.branch\n  ]\n}}",
+              "type": "string"
+            },
+            {
+              "id": "9d929219-7977-4175-8b6a-cf5137ec3ec7",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        -304
+      ],
+      "id": "c4faf19f-fc14-41bf-9331-3476be70e76c",
+      "name": "branch mapping"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "branch Number",
+              "value": "={{\n  {\n    \"Head Office\": \"971526699343\",\n    \"shamkha\": \"971526699343\",\n    \"shahama\": \"971526699343\",\n    \"sarouj\": \"971526699343\",\n    \"Mushref\": \"971526699343\",\n    \"shakhbout\": \"971526699343\",\n    \"Towaya\": \"971526699343\",\n    \"Khorfakkan\": \"971526699343\",\n    \"MBZ\": \"971526699343\"\n  }[\n    $json.body.branch\n  ]\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        560
+      ],
+      "id": "5c0e9979-bac3-49f6-9937-918d792e9f43",
+      "name": "branch mapping1"
+    },
+    {
+      "parameters": {
+        "resource": "MESSAGES",
+        "operation": "SEND_MESSAGE",
+        "identifierType": "phone",
+        "contactIdentifier": "={{ $json['branch Number'] }}",
+        "channelId": 440693,
+        "text": "=Please not that there have been an error likely due to the customer not recieving the invoice info.\n\nIf so please do notify the customer."
+      },
+      "type": "@respond-io/n8n-nodes-respond-io.respondio",
+      "typeVersion": 1,
+      "position": [
+        1504,
+        560
+      ],
+      "id": "bd839664-74d7-462a-9734-146ecd8d5572",
+      "name": "Inform error",
+      "credentials": {
+        "respondIoApi": {
+          "id": "Y1oP1rI3ATE9710R",
+          "name": "Respond.io account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Error handiling\nAn error likly to happen in the `send to customer` node, if so the branch manager is notifyed with the filier ",
+        "height": 432,
+        "width": 816,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1008,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "54fd0f4c-c160-4ca0-8ca2-b1a95aaf7580",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "resource": "CONTACTS",
+        "operation": "CREATE_OR_UPDATE_CONTACT",
+        "identifierType": "phone",
+        "contactIdentifier": "=971{{ $json.contact_number }}",
+        "firstName": "={{ $('Webhook').item.json.body.contact_name }}",
+        "phone": "=971{{ $json.contact_number }}",
+        "customFields": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [
+            "need_human"
+          ],
+          "schema": [
+            {
+              "id": "need_human",
+              "displayName": "need_human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@respond-io/n8n-nodes-respond-io.respondio",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        -496
+      ],
+      "id": "4a31e916-baf4-4f9e-b94b-1a208c65e47c",
+      "name": "Create or Update a Contact",
+      "credentials": {
+        "respondIoApi": {
+          "id": "Y1oP1rI3ATE9710R",
+          "name": "Respond.io account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Notify invoice confirmation\n- The data fields is recieved from the `zoho books webhook`.\n- the `branch mapping` is used to mab the notification to one of the nine crossponding branch manager.\n- To pervent an error from respond.io api due to the contact does not exsist the `create or update contact` node is used to make sure that the contact is exsestance on the platform.\n- `send to contact` node is used to notify the customer wiht the invoice confirmation.",
+        "height": 688,
+        "width": 1104
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        976,
+        -768
+      ],
+      "typeVersion": 1,
+      "id": "6a94ef3d-ae7d-49cb-9c78-e62c35266a4d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "resource": "MESSAGES",
+        "operation": "SEND_MESSAGE",
+        "identifierType": "phone",
+        "contactIdentifier": "=+971{{ $('Remove spaces from numbers').item.json.contact_number }}",
+        "channelId": 440693,
+        "messageType": "whatsapp_template",
+        "templateId": 46788193,
+        "templateLanguageCode": "ar",
+        "whatsappTemplateComponentFields": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "$input$_body_1": "={{ $('Webhook').item.json.body.contact_name }}",
+            "$input$_body_2": "={{ $('Webhook').item.json.body.invoice_url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "$input$_body_1",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{1}}",
+              "type": "string",
+              "defaultMatch": false
+            },
+            {
+              "id": "$input$_body_2",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{2}}",
+              "type": "string",
+              "defaultMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@respond-io/n8n-nodes-respond-io.respondio",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -496
+      ],
+      "id": "6fd2c519-89b1-4487-ac69-c369ea12b995",
+      "name": "send to customer1",
+      "credentials": {
+        "respondIoApi": {
+          "id": "Y1oP1rI3ATE9710R",
+          "name": "Respond.io account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "MESSAGES",
+        "operation": "SEND_MESSAGE",
+        "identifierType": "phone",
+        "contactIdentifier": "={{ $json['branch Number'] }}",
+        "channelId": 440693,
+        "messageType": "whatsapp_template",
+        "templateId": 46788187,
+        "templateLanguageCode": "en_AE",
+        "whatsappTemplateComponentFields": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "$input$_body_1": "={{ $json.body.branch }}",
+            "$input$_body_2": "={{ $json.body.invoice_id }}",
+            "$input$_body_3": "={{ $json.body.contact_name }}",
+            "$input$_body_4": "={{ $json.body.total }}",
+            "$input$_body_5": "={{ $json.body.due_date }}",
+            "$input$_body_6": "={{ $json.body.stype }}",
+            "$input$_body_7": "={{ $json.body.invoice_url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "$input$_body_1",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{1}}",
+              "type": "string",
+              "defaultMatch": false
+            },
+            {
+              "id": "$input$_body_2",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{2}}",
+              "type": "string",
+              "defaultMatch": false
+            },
+            {
+              "id": "$input$_body_3",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{3}}",
+              "type": "string",
+              "defaultMatch": false
+            },
+            {
+              "id": "$input$_body_4",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{4}}",
+              "type": "string",
+              "defaultMatch": false
+            },
+            {
+              "id": "$input$_body_5",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{5}}",
+              "type": "string",
+              "defaultMatch": false
+            },
+            {
+              "id": "$input$_body_6",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{6}}",
+              "type": "string",
+              "defaultMatch": false
+            },
+            {
+              "id": "$input$_body_7",
+              "display": true,
+              "required": true,
+              "displayName": "Body Param {{7}}",
+              "type": "string",
+              "defaultMatch": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@respond-io/n8n-nodes-respond-io.respondio",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -304
+      ],
+      "id": "67efa272-1f92-4727-a691-063a0ab67cd5",
+      "name": "Send to branch",
+      "credentials": {
+        "respondIoApi": {
+          "id": "Y1oP1rI3ATE9710R",
+          "name": "Respond.io account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "return [\n  {\n    \"json\": {\n      \"contact_number\": _items[0][\"json\"][\"body\"][\"contact_number\"].replace(\" \", \"\")\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        -512
+      ],
+      "id": "c16ab232-2b5e-4ca2-a627-db3051293e86",
+      "name": "Remove spaces from numbers"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "stanford-nursery.app.n8n.cloud",
+            "user-agent": "PostmanRuntime/7.49.1",
+            "content-length": "679",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cache-control": "no-cache",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "197.48.233.105",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "EG",
+            "cf-ray": "9b0f5a94d494d4b8-MRS",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "postman-token": "b77f9ef7-022e-4c0f-98a2-93c00c725dfb",
+            "x-forwarded-for": "197.48.233.105, 162.158.23.192",
+            "x-forwarded-host": "stanford-nursery.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-34-f494454b5-5tncs",
+            "x-is-trusted": "yes",
+            "x-real-ip": "197.48.233.105"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "contact_name": "Amna Abdulla Alhammadi ( Al shahama)",
+            "total": "100.00",
+            "notes": "Thanks for your business.",
+            "supject": "",
+            "stype": "UNIFORM",
+            "due_date": "20 Nov 2025",
+            "invoice_id": "4364590000009281011",
+            "payment": "",
+            "branch": "",
+            "contact_number": "56 775 5539",
+            "invoice_url": "https://zohosecurepay.com/books/aldanaprivatenursery/secure?CInvoiceID=2-857e03ea45abd78d3afd3e661af3b700d6dbcde52d9ed23e4e2bd799b5c46bd63d52461e498d984ad192a6912aafceae64d1f0133896654ccd75ad4e7945e50ca465b6cc8b7851c7 "
+          },
+          "webhookUrl": "https://stanford-nursery.app.n8n.cloud/webhook-test/47b87a13-90ba-4fa0-8ea8-025938905a16",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "branch mapping",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Remove spaces from numbers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "branch mapping": {
+      "main": [
+        [
+          {
+            "node": "Send to branch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "branch mapping1": {
+      "main": [
+        [
+          {
+            "node": "Inform error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or Update a Contact": {
+      "main": [
+        [
+          {
+            "node": "send to customer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove spaces from numbers": {
+      "main": [
+        [
+          {
+            "node": "Create or Update a Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "rprTzOzQfwz6EAaZ"
+  },
+  "versionId": "0db57078-d521-4552-adc0-a2f011179e06",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "685e90ba3fd237436e3a6291ba1d1860e8194f0ef7043833d8df103189967030"
+  },
+  "id": "rprTzOzQfwz6EAaZ",
+  "tags": []
+}
